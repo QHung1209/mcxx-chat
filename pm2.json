@@ -1,16 +1,10 @@
 {
   "apps": [
     {
+      "name": "mcxx_chat",
       "script": "main_dist/main.js",
-      "instances": "1",
       "exec_mode": "cluster",
-      "name": "mcxx_chat_primary"
-    },
-    {
-      "script": "main_dist/main.js",
-      "instances": "-1",
-      "exec_mode": "cluster",
-      "name": "mcxx_chat_replica"
+      "instances": -1
     }
   ]
 }

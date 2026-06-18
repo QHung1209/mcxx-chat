@@ -13,8 +13,6 @@ import { AuthTrackingRepository } from './repositories/auth-tracking.repository'
 import { HttpModule } from '@nestjs/axios';
 import { AuthTrackingEntity } from './entities/auth-tracking.entity';
 import { RedisService } from './services/redis.service';
-import { CacheModule } from '@nestjs/cache-manager';
-import * as redisStore from 'cache-manager-redis-store';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { EventGateway } from './event.gateway';
 
@@ -37,18 +35,6 @@ import { EventGateway } from './event.gateway';
     }),
     BullModule.registerQueue({ name: 'send-email-queue' }),
     HttpModule,
-    CacheModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (config: ConfigService) => ({
-        store: redisStore,
-        host: config.get('REDIS_HOST'),
-        port: config.get('REDIS_PORT'),
-        password: config.get('REDIS_PASSWORD'),
-        db: config.get('REDIS_INDEX'),
-        ttl: 600,
-      }),
-    }),
     RedisModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -78,7 +64,6 @@ import { EventGateway } from './event.gateway';
   exports: [
     BaseAuthService,
     AuthTrackingRepository,
-    CacheModule,
     RedisService,
     EventGateway,
     JwtModule,
