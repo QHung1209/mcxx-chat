@@ -1,0 +1,9 @@
+{
+  "LOGIN_FAILED": "Email hoặc mật khẩu không đúng.",
+  "ACCOUNT_NOT_FOUND": "Không tìm thấy tài khoản.",
+  "INVALID_CREDENTIAL": "Thông tin xác thực không hợp lệ.",
+  "OTP_EXPIRATION": "Mã xác thực đã hết hạn.",
+  "OTP_NOT_MATCH": "Mã xác thực không đúng.",
+  "FORGOT_PASSWORD": "Đặt lại mật khẩu",
+  "VERIFY_EMAIL": "Xác thực email"
+}

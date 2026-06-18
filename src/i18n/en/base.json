@@ -1,0 +1,9 @@
+{
+  "LOGIN_FAILED": "Incorrect email or password.",
+  "ACCOUNT_NOT_FOUND": "Account not found.",
+  "INVALID_CREDENTIAL": "Invalid credentials.",
+  "OTP_EXPIRATION": "The verification code has expired.",
+  "OTP_NOT_MATCH": "The verification code is incorrect.",
+  "FORGOT_PASSWORD": "Reset your password",
+  "VERIFY_EMAIL": "Verify your email"
+}
