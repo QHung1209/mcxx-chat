@@ -6,18 +6,18 @@ import { User } from 'src/identity/entities/user.entity';
 @Entity('chat__poll_vote')
 @Index('idx_pollvote_optionId_userId', ['optionId', 'userId'])
 export class PollVote extends DefaultEntity {
-  @Column()
-  optionId: number;
+  @Column('uuid')
+  optionId: string;
 
   @ManyToOne(() => PollOption, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'optionId' })
   option: PollOption;
 
-  @Column()
-  pollId: number;
+  @Column('uuid')
+  pollId: string;
 
-  @Column()
-  userId: number;
+  @Column('uuid')
+  userId: string;
 
   @ManyToOne(() => User)
   user: User;

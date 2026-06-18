@@ -7,15 +7,15 @@ import { User } from 'src/identity/entities/user.entity';
 @Index('idx_reaction_messageId_userId', ['messageId', 'createdAt'])
 @Unique('uq_reaction_messageId_userId', ['messageId', 'userId'])
 export class Reaction extends DefaultEntity {
-  @Column()
-  messageId: number;
+  @Column('uuid')
+  messageId: string;
 
   @ManyToOne(() => Message, (message) => message.reactions)
   @JoinColumn({ name: 'messageId' })
   message: Message;
 
-  @Column()
-  userId: number;
+  @Column('uuid')
+  userId: string;
 
   @ManyToOne(() => User, (user) => user.reactions)
   user: User;

@@ -4,7 +4,7 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Post,
   Put,
   Query,
@@ -67,7 +67,7 @@ export class ChatController {
   @Put(':id')
   @ChatOwner()
   async updateChat(
-    @Param('id', ParseIntPipe) chatId: number,
+    @Param('id', ParseUUIDPipe) chatId: string,
     @Body() dto: UpdateChatDto,
   ) {
     await this.chatService.updateChat(chatId, dto);
@@ -84,7 +84,7 @@ export class ChatController {
   @ChatMember()
   async createPoll(
     @Req() req: any,
-    @Param('id', ParseIntPipe) chatId: number,
+    @Param('id', ParseUUIDPipe) chatId: string,
     @Body() dto: CreatePollDto,
   ) {
     const result = await this.pollService.createPoll(req.user.id, chatId, dto);
@@ -95,9 +95,9 @@ export class ChatController {
   @ChatMember()
   async votePoll(
     @Req() req: any,
-    @Param('id', ParseIntPipe) _chatId: number,
-    @Param('pollId', ParseIntPipe) pollId: number,
-    @Body('optionId', ParseIntPipe) optionId: number,
+    @Param('id', ParseUUIDPipe) _chatId: string,
+    @Param('pollId', ParseUUIDPipe) pollId: string,
+    @Body('optionId', ParseUUIDPipe) optionId: string,
   ) {
     await this.pollService.vote(req.user.id, pollId, optionId);
     return { statusCode: 200 };
@@ -107,8 +107,8 @@ export class ChatController {
   @ChatMember()
   async closePoll(
     @Req() req: any,
-    @Param('id', ParseIntPipe) _chatId: number,
-    @Param('pollId', ParseIntPipe) pollId: number,
+    @Param('id', ParseUUIDPipe) _chatId: string,
+    @Param('pollId', ParseUUIDPipe) pollId: string,
   ) {
     await this.pollService.closePoll(pollId, req.user.id);
     return { statusCode: 200 };
@@ -118,8 +118,8 @@ export class ChatController {
   @ChatMember()
   async deletePoll(
     @Req() req: any,
-    @Param('id', ParseIntPipe) _chatId: number,
-    @Param('pollId', ParseIntPipe) pollId: number,
+    @Param('id', ParseUUIDPipe) _chatId: string,
+    @Param('pollId', ParseUUIDPipe) pollId: string,
   ) {
     await this.pollService.deletePoll(req.user.id, pollId);
     return { statusCode: 200 };
@@ -128,8 +128,8 @@ export class ChatController {
   @Get(':id/poll/:pollId/option/:optionId/votes')
   @ChatMember()
   async getPollVotes(
-    @Param('id', ParseIntPipe) _chatId: number,
-    @Param('optionId', ParseIntPipe) optionId: number,
+    @Param('id', ParseUUIDPipe) _chatId: string,
+    @Param('optionId', ParseUUIDPipe) optionId: string,
     @Query('createdAt') createdAt?: string,
   ) {
     const result = await this.pollService.detailVotes(
@@ -142,8 +142,8 @@ export class ChatController {
   @Get(':id/message/:messageId/reaction')
   @ChatMember()
   async getReactionDetail(
-    @Param('id', ParseIntPipe) _chatId: number,
-    @Param('messageId', ParseIntPipe) messageId: number,
+    @Param('id', ParseUUIDPipe) _chatId: string,
+    @Param('messageId', ParseUUIDPipe) messageId: string,
     @Query('emoji') emoji: string,
     @Query('createdAt') createdAt?: string,
   ) {
@@ -159,8 +159,8 @@ export class ChatController {
   @ChatMember()
   async reactToMessage(
     @Req() req: any,
-    @Param('id', ParseIntPipe) chatId: number,
-    @Param('messageId', ParseIntPipe) messageId: number,
+    @Param('id', ParseUUIDPipe) chatId: string,
+    @Param('messageId', ParseUUIDPipe) messageId: string,
     @Body('emoji') emoji: string,
   ) {
     await this.reactionService.upsert(req.user.id, chatId, messageId, emoji);
@@ -171,8 +171,8 @@ export class ChatController {
   @ChatMember()
   async markSeen(
     @Req() req: any,
-    @Param('id', ParseIntPipe) chatId: number,
-    @Body('messageId') messageId: number,
+    @Param('id', ParseUUIDPipe) chatId: string,
+    @Body('messageId') messageId: string,
   ) {
     await this.chatMemberService.markSeen(req.user.id, chatId, messageId);
     return { statusCode: 200 };
@@ -182,7 +182,7 @@ export class ChatController {
   @ChatMember()
   async searchMessages(
     @Req() req: any,
-    @Param('id', ParseIntPipe) chatId: number,
+    @Param('id', ParseUUIDPipe) chatId: string,
     @Query('q') q: string,
     @Query('beforeId') beforeId?: string,
     @Query('limit') limit?: string,
@@ -191,7 +191,7 @@ export class ChatController {
       req.user.id,
       chatId,
       q,
-      beforeId ? Number(beforeId) : undefined,
+      beforeId || undefined,
       limit ? Number(limit) : undefined,
     );
     return { statusCode: 200, result };
@@ -201,7 +201,7 @@ export class ChatController {
   @ChatMember()
   async getMessages(
     @Req() req: any,
-    @Param('id', ParseIntPipe) chatId: number,
+    @Param('id', ParseUUIDPipe) chatId: string,
     @Query('beforeId') beforeId?: string,
     @Query('limit') limit?: string,
     @Query('aroundId') aroundId?: string,
@@ -210,10 +210,10 @@ export class ChatController {
     const result = await this.messageService.getMessages(
       req.user.id,
       chatId,
-      beforeId ? Number(beforeId) : undefined,
+      beforeId || undefined,
       limit ? Number(limit) : undefined,
-      aroundId ? Number(aroundId) : undefined,
-      afterId ? Number(afterId) : undefined,
+      aroundId || undefined,
+      afterId || undefined,
     );
     return { statusCode: 200, result };
   }
@@ -222,7 +222,7 @@ export class ChatController {
   @ChatMember()
   async sendMessage(
     @Req() req: any,
-    @Param('id', ParseIntPipe) chatId: number,
+    @Param('id', ParseUUIDPipe) chatId: string,
     @Body() dto: CreateMessageDto,
   ) {
     const { message: result } = await this.messageService.createMessage(
@@ -237,7 +237,7 @@ export class ChatController {
   @ChatMember()
   async deleteMessage(
     @Req() req: any,
-    @Param('messageId', ParseIntPipe) messageId: number,
+    @Param('messageId', ParseUUIDPipe) messageId: string,
   ) {
     await this.messageService.deleteMessage(req.user.id, messageId);
     return { statusCode: 200 };
@@ -247,7 +247,7 @@ export class ChatController {
   @ChatMember()
   async forwardMessage(
     @Req() req: any,
-    @Param('messageId', ParseIntPipe) messageId: number,
+    @Param('messageId', ParseUUIDPipe) messageId: string,
     @Body() dto: ForwardMessageDto,
   ) {
     const result = await this.messageService.forwardMessage(
@@ -260,7 +260,7 @@ export class ChatController {
 
   @Get(':id/pin')
   @ChatMember()
-  async getPinnedMessages(@Param('id', ParseIntPipe) chatId: number) {
+  async getPinnedMessages(@Param('id', ParseUUIDPipe) chatId: string) {
     const result = await this.messageService.getPinnedMessages(chatId);
     return { statusCode: 200, result };
   }
@@ -268,8 +268,8 @@ export class ChatController {
   @Post(':id/pin/:messageId')
   @ChatMember()
   async pinMessage(
-    @Param('id', ParseIntPipe) chatId: number,
-    @Param('messageId', ParseIntPipe) messageId: number,
+    @Param('id', ParseUUIDPipe) chatId: string,
+    @Param('messageId', ParseUUIDPipe) messageId: string,
   ) {
     const result = await this.messageService.pinMessage(chatId, messageId);
     return { statusCode: 200, result };
@@ -278,8 +278,8 @@ export class ChatController {
   @Delete(':id/pin/:messageId')
   @ChatMember()
   async unpinMessage(
-    @Param('id', ParseIntPipe) chatId: number,
-    @Param('messageId', ParseIntPipe) messageId: number,
+    @Param('id', ParseUUIDPipe) chatId: string,
+    @Param('messageId', ParseUUIDPipe) messageId: string,
   ) {
     await this.messageService.unpinMessage(chatId, messageId);
     return { statusCode: 200 };
@@ -288,7 +288,7 @@ export class ChatController {
   @Get(':id/shared')
   @ChatMember()
   async getSharedContent(
-    @Param('id', ParseIntPipe) chatId: number,
+    @Param('id', ParseUUIDPipe) chatId: string,
     @Query('tab') tab: 'media' | 'file' | 'link',
     @Query('beforeId') beforeId?: string,
     @Query('limit') limit?: string,
@@ -296,7 +296,7 @@ export class ChatController {
     const result = await this.messageService.getSharedContent(
       chatId,
       tab,
-      beforeId ? Number(beforeId) : undefined,
+      beforeId || undefined,
       limit ? Number(limit) : undefined,
     );
     return { statusCode: 200, result };
@@ -305,8 +305,8 @@ export class ChatController {
   @Get(':id/message/:messageId/seen')
   @ChatMember()
   async getSeenBy(
-    @Param('id', ParseIntPipe) chatId: number,
-    @Param('messageId', ParseIntPipe) messageId: number,
+    @Param('id', ParseUUIDPipe) chatId: string,
+    @Param('messageId', ParseUUIDPipe) messageId: string,
   ) {
     const result = await this.chatMemberService.getSeenBy(chatId, messageId);
     return { statusCode: 200, result };
@@ -314,7 +314,7 @@ export class ChatController {
 
   @Get(':id/member')
   @ChatMember()
-  async getMembers(@Param('id', ParseIntPipe) chatId: number) {
+  async getMembers(@Param('id', ParseUUIDPipe) chatId: string) {
     const result = await this.chatMemberService.getMembers(chatId);
     return { statusCode: 200, result };
   }
@@ -323,8 +323,8 @@ export class ChatController {
   @ChatMember()
   async addMembers(
     @Req() req: any,
-    @Param('id', ParseIntPipe) chatId: number,
-    @Body('userIds') userIds: number[],
+    @Param('id', ParseUUIDPipe) chatId: string,
+    @Body('userIds') userIds: string[],
   ) {
     await this.chatMemberService.addMembersToChat(req.user, chatId, userIds);
     return { statusCode: 201 };
@@ -334,8 +334,8 @@ export class ChatController {
   @ChatOwner()
   async updateMemberRole(
     @Req() req: any,
-    @Param('id', ParseIntPipe) chatId: number,
-    @Param('userId', ParseIntPipe) userId: number,
+    @Param('id', ParseUUIDPipe) chatId: string,
+    @Param('userId', ParseUUIDPipe) userId: string,
     @Body('role') role: ChatRole,
   ) {
     await this.chatMemberService.updateMemberRoleInChat(
@@ -349,7 +349,7 @@ export class ChatController {
 
   @Delete(':id/member/me')
   @ChatMember()
-  async leaveChat(@Req() req: any, @Param('id', ParseIntPipe) chatId: number) {
+  async leaveChat(@Req() req: any, @Param('id', ParseUUIDPipe) chatId: string) {
     await this.chatMemberService.leaveChat(req.user.id, chatId);
     return { statusCode: 200 };
   }
@@ -358,8 +358,8 @@ export class ChatController {
   @ChatOwner()
   async removeMember(
     @Req() req: any,
-    @Param('id', ParseIntPipe) chatId: number,
-    @Param('userId', ParseIntPipe) userId: number,
+    @Param('id', ParseUUIDPipe) chatId: string,
+    @Param('userId', ParseUUIDPipe) userId: string,
   ) {
     await this.chatMemberService.removeMemberFromChat(
       chatId,

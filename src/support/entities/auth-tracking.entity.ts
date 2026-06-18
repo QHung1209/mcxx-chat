@@ -7,8 +7,8 @@ const AUTH_TRACKING_TABLE_NAME = 'auth__tracking';
 export class AuthTrackingEntity extends DefaultEntity {
   static TABLE_NAME = AUTH_TRACKING_TABLE_NAME;
 
-  @Column()
-  userId: number;
+  @Column('uuid')
+  userId: string;
 
   @Column()
   scope: string;

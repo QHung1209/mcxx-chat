@@ -6,7 +6,7 @@ export class InitSupport1778032321958 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `CREATE TABLE "password__resets" (
-        "id" SERIAL NOT NULL,
+        "id" uuid NOT NULL DEFAULT uuid_generate_v7(),
         "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "email" character varying NOT NULL,
         "code" character varying NOT NULL,
@@ -17,10 +17,10 @@ export class InitSupport1778032321958 implements MigrationInterface {
     );
     await queryRunner.query(
       `CREATE TABLE "auth__tracking" (
-        "id" SERIAL NOT NULL,
+        "id" uuid NOT NULL DEFAULT uuid_generate_v7(),
         "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-        "userId" integer NOT NULL,
+        "userId" uuid NOT NULL,
         "scope" character varying NOT NULL,
         "userAgent" character varying NOT NULL,
         "ip" character varying NOT NULL,

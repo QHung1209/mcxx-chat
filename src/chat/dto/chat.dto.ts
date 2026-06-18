@@ -1,20 +1,21 @@
-import { IsArray, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateGroupChatDto {
   @IsString()
   name: string;
 
   @IsOptional()
-  @IsNumber()
-  avatar?: number;
+  @IsUUID()
+  avatar?: string;
 
   @IsArray()
-  userIds: number[];
+  @IsUUID('all', { each: true })
+  userIds: string[];
 }
 
 export class StartChatDto {
-  @IsNumber()
-  userId: number;
+  @IsUUID()
+  userId: string;
 }
 
 export class UpdateChatDto {
@@ -23,6 +24,6 @@ export class UpdateChatDto {
   name?: string;
 
   @IsOptional()
-  @IsNumber()
-  avatar?: number;
+  @IsUUID()
+  avatar?: string;
 }

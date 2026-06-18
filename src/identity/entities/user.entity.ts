@@ -19,8 +19,8 @@ export class User extends DefaultEntity {
   @Column({ type: 'varchar', nullable: true, length: 255 })
   googleId: string;
 
-  @Column({ type: 'int', nullable: true })
-  avatarMediaId: number | null;
+  @Column({ type: 'uuid', nullable: true })
+  avatarMediaId: string | null;
 
   @ManyToOne(() => MediaEntity, { nullable: true })
   @JoinColumn({ name: 'avatarMediaId' })

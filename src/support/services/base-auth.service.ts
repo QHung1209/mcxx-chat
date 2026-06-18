@@ -181,7 +181,7 @@ export class BaseAuthService {
     );
   }
 
-  async clearPermission(ids: number[], scope) {
+  async clearPermission(ids: string[], scope) {
     for (const id of ids) {
       await this.redisService.delete(`permissions:${scope}:${id}`);
     }

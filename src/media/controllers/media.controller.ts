@@ -35,7 +35,7 @@ export class UserMediaController {
     private readonly i18n: I18nService,
   ) {}
 
-  private uploaderId(req: any): number {
+  private uploaderId(req: any): string {
     return req.user.id;
   }
 
@@ -56,7 +56,7 @@ export class UserMediaController {
   }
 
   @Get(':id')
-  async detail(@Param('id') id: number, @Req() req: any) {
+  async detail(@Param('id') id: string, @Req() req: any) {
     const media = await this.mediaService.detail(id, this.uploaderId(req));
     return { statusCode: 200, result: media };
   }
@@ -111,7 +111,7 @@ export class UserMediaController {
 
   @Put(':id/acl')
   async updateAcl(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() dto: AclMediaDto,
     @Req() req: any,
   ) {
@@ -121,7 +121,7 @@ export class UserMediaController {
 
   @Put(':id/active')
   async updateActive(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() dto: ActiveMediaDto,
     @Req() req: any,
   ) {
@@ -130,19 +130,19 @@ export class UserMediaController {
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: number, @Req() req: any) {
+  async delete(@Param('id') id: string, @Req() req: any) {
     await this.mediaService.delete(id, this.uploaderId(req));
     return { statusCode: 200 };
   }
 
   @Put(':id/put-back')
-  async putBack(@Param('id') id: number, @Req() req: any) {
+  async putBack(@Param('id') id: string, @Req() req: any) {
     await this.mediaService.putBack(id, this.uploaderId(req));
     return { statusCode: 200 };
   }
 
   @Delete(':id/forever')
-  async deleteForever(@Param('id') id: number, @Req() req: any) {
+  async deleteForever(@Param('id') id: string, @Req() req: any) {
     await this.mediaService.deleteForever(id, this.uploaderId(req));
     return { statusCode: 200 };
   }

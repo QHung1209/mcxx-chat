@@ -1,4 +1,4 @@
-import { IsIn, IsNumber, IsOptional } from 'class-validator';
+import { IsIn, IsOptional, IsUUID } from 'class-validator';
 import { MessageType } from '../enums/chat.enum';
 
 const SENDABLE_MESSAGE_TYPES = [
@@ -16,16 +16,16 @@ export class CreateMessageDto {
   @IsOptional()
   type?: MessageType;
 
-  replyToMessageId?: number;
+  replyToMessageId?: string;
 
-  mediaIds?: number[];
+  mediaIds?: string[];
 
-  mentionIds?: number[];
+  mentionIds?: string[];
 
   mentionAll?: boolean;
 }
 
 export class ForwardMessageDto {
-  @IsNumber()
-  toChatId: number;
+  @IsUUID()
+  toChatId: string;
 }

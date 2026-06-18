@@ -52,7 +52,7 @@ export class ChatService {
     return chat;
   }
 
-  async updateChat(chatId: number, dto: UpdateChatDto) {
+  async updateChat(chatId: string, dto: UpdateChatDto) {
     const dataUpdate: any = {};
     if (dto.name) dataUpdate.name = dto.name;
     if (dto.avatar) dataUpdate.avatarMediaId = dto.avatar;
@@ -78,9 +78,9 @@ export class ChatService {
         'user.name as name',
       ])
       .getRawOne<{
-        id: number;
+        id: string;
         type: ChatType;
-        userId: number;
+        userId: string;
         name: string;
       }>();
 
@@ -113,7 +113,7 @@ export class ChatService {
 
   private async withOtherUserAvatar<T extends object>(
     result: T,
-    otherUserId?: number,
+    otherUserId?: string,
   ): Promise<T & { avatar: any }> {
     if (!otherUserId) return { ...result, avatar: null };
     const other = await this.userRepository.findOne({
@@ -211,7 +211,7 @@ export class ChatService {
     const unreadMap = new Map(
       unreadRows.map((r) => [r.chatId, Number(r.unread)]),
     );
-    const mentionMap = new Map(mentionRows.map((r) => [Number(r.chatId), r]));
+    const mentionMap = new Map(mentionRows.map((r) => [r.chatId, r]));
 
     return allChats.map((chat) => {
       const otherUser = chat.members?.[0]?.user ?? null;
@@ -229,8 +229,8 @@ export class ChatService {
         unread: unreadMap.get(chat.id) ?? 0,
         mention: mention
           ? {
-              messageId: Number(mention.messageId),
-              senderId: Number(mention.senderId),
+              messageId: mention.messageId,
+              senderId: mention.senderId,
             }
           : null,
         updatedAt: chat.updatedAt,
@@ -254,7 +254,7 @@ export class ChatService {
       .getCount();
   }
 
-  private async getUnreadRows(user, chatIds: number[]) {
+  private async getUnreadRows(user, chatIds: string[]) {
     return this.messageRepository
       .createQueryBuilder('message')
       .select(['message."chatId" as "chatId"', 'COUNT(message.id) as unread'])
@@ -273,7 +273,7 @@ export class ChatService {
       .getRawMany();
   }
 
-  private async getMentionRows(user, chatIds: number[]) {
+  private async getMentionRows(user, chatIds: string[]) {
     return this.messageRepository
       .createQueryBuilder('message')
       .select([
@@ -299,9 +299,9 @@ export class ChatService {
       .orderBy('message."chatId"')
       .addOrderBy('message.id', 'DESC')
       .getRawMany<{
-        chatId: number;
-        messageId: number;
-        senderId: number;
+        chatId: string;
+        messageId: string;
+        senderId: string;
       }>();
   }
 }

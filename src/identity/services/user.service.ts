@@ -6,7 +6,7 @@ import { UpdateProfileDto } from '../dto/auth.dto';
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async getUserById(userId: number) {
+  async getUserById(userId: string) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
       select: ['id', 'name', 'email', 'avatarMediaId'],
@@ -15,13 +15,13 @@ export class UserService {
     return user;
   }
 
-  async updateProfile(userId: number, dto: UpdateProfileDto) {
+  async updateProfile(userId: string, dto: UpdateProfileDto) {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('Account not found');
     }
 
-    const patch: { name?: string; avatarMediaId?: number } = {};
+    const patch: { name?: string; avatarMediaId?: string } = {};
     if (dto.name) patch.name = dto.name;
     if (dto.mediaId) patch.avatarMediaId = dto.mediaId;
 

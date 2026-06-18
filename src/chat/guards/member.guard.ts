@@ -12,7 +12,7 @@ export class IsMemberGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const chatId = Number(request.params.id);
+    const chatId = request.params.id;
     const userId = request.user?.id;
 
     if (!chatId || !userId) return false;

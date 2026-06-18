@@ -6,13 +6,13 @@ export class InitIdentity1778000000002 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `CREATE TABLE "identity__users" (
-        "id" SERIAL NOT NULL,
+        "id" uuid NOT NULL DEFAULT uuid_generate_v7(),
         "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "email" character varying(255) NOT NULL,
         "name" character varying(255) NOT NULL,
         "googleId" character varying(255),
-        "avatarMediaId" integer,
+        "avatarMediaId" uuid,
         "password" character varying(255) NOT NULL,
         "isActive" boolean NOT NULL DEFAULT true,
         CONSTRAINT "PK_identity_users" PRIMARY KEY ("id")

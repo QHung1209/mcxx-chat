@@ -23,11 +23,11 @@ export class PollService {
     private readonly redisService: RedisService,
   ) {}
 
-  private pollVoteKey(pollId: number) {
+  private pollVoteKey(pollId: string) {
     return `poll:votes:${pollId}`;
   }
 
-  private async initVoteCache(pollId: number, key: string): Promise<void> {
+  private async initVoteCache(pollId: string, key: string): Promise<void> {
     const [options, counts] = await Promise.all([
       this.pollOptionRepository.find({ where: { pollId } }),
       this.pollVoteRepository
@@ -53,9 +53,9 @@ export class PollService {
   }
 
   private async updateVoteCache(
-    pollId: number,
+    pollId: string,
     key: string,
-    optionId: number,
+    optionId: string,
     delta: number,
   ): Promise<void> {
     const exists = await this.redisService.exists(key);
@@ -67,7 +67,7 @@ export class PollService {
     await this.redisService.hIncrBy(key, String(optionId), delta);
   }
 
-  async createPoll(senderId: number, chatId: number, dto: CreatePollDto) {
+  async createPoll(senderId: string, chatId: string, dto: CreatePollDto) {
     const { message, memberIds } = await this.messageService.createMessage(
       senderId,
       { type: MessageType.POLL, content: dto.content },
@@ -129,7 +129,7 @@ export class PollService {
     return fullMessage;
   }
 
-  async vote(userId: number, pollId: number, optionId: number) {
+  async vote(userId: string, pollId: string, optionId: string) {
     const poll = await this.pollRepository.findOne({
       where: { id: pollId },
       relations: ['message'],
@@ -149,7 +149,7 @@ export class PollService {
     });
   }
 
-  async closePoll(pollId: number, userId: number) {
+  async closePoll(pollId: string, userId: string) {
     const poll = await this.pollRepository.findOne({
       where: { id: pollId },
       relations: ['message'],
@@ -163,7 +163,7 @@ export class PollService {
     });
   }
 
-  async deletePoll(userId: number, pollId: number) {
+  async deletePoll(userId: string, pollId: string) {
     const poll = await this.pollRepository.findOne({
       where: { id: pollId },
       relations: ['message'],
@@ -177,7 +177,7 @@ export class PollService {
     await this.redisService.delete(this.pollVoteKey(pollId));
   }
 
-  async detailVotes(optionId: number, createdAt?: Date) {
+  async detailVotes(optionId: string, createdAt?: Date) {
     const qb = this.pollVoteRepository
       .createQueryBuilder('vote')
       .where('vote.optionId = :optionId', { optionId })
@@ -194,9 +194,9 @@ export class PollService {
   }
 
   private async applyVoteChange(
-    userId: number,
-    pollId: number,
-    optionId: number,
+    userId: string,
+    pollId: string,
+    optionId: string,
     pollType: PollType,
     key: string,
   ): Promise<void> {
@@ -210,7 +210,7 @@ export class PollService {
       return;
     }
 
-    let oldOptionId: number | null = null;
+    let oldOptionId: string | null = null;
     if (pollType === PollType.SINGLE) {
       const currentVote = await this.pollVoteRepository.findOne({
         where: { userId, pollId },
@@ -232,7 +232,7 @@ export class PollService {
     const hash = await this.redisService.hGetAll(key);
 
     const counts = Object.entries(hash ?? {}).map(([id, count]) => ({
-      id: Number(id),
+      id,
       count: Math.max(0, Number(count)),
     }));
 
@@ -240,8 +240,8 @@ export class PollService {
 
     const previewRows:
       | {
-          optionId: number;
-          userId: number;
+          optionId: string;
+          userId: string;
         }[]
       | [] =
       optionIds.length > 0
@@ -263,11 +263,11 @@ export class PollService {
           )
         : [];
 
-    const previewMap = new Map<number, number[]>();
+    const previewMap = new Map<string, string[]>();
 
     for (const row of previewRows) {
       const arr = previewMap.get(row.optionId) ?? [];
-      arr.push(Number(row.userId));
+      arr.push(row.userId);
       previewMap.set(row.optionId, arr);
     }
 

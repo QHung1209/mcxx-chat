@@ -40,9 +40,9 @@ export class MessageService {
   ) {}
 
   async createMessage(
-    senderId: number,
+    senderId: string,
     data: CreateMessageDto,
-    chatId: number,
+    chatId: string,
     suppressEvent = false,
   ) {
     const isMember = await this.chatMemberService.isMember(chatId, senderId);
@@ -118,10 +118,10 @@ export class MessageService {
   }
 
   private async enqueueLinkPreview(
-    messageId: number,
-    chatId: number,
+    messageId: string,
+    chatId: string,
     url: string,
-    memberIds: number[],
+    memberIds: string[],
   ) {
     await this.linkPreviewQueue.add(
       LINK_PREVIEW_JOB,
@@ -136,7 +136,7 @@ export class MessageService {
     );
   }
 
-  async deleteMessage(userId: number, messageId: number) {
+  async deleteMessage(userId: string, messageId: string) {
     const message = await this.messageRepository.findOne({
       where: { id: messageId },
     });
@@ -167,8 +167,8 @@ export class MessageService {
   }
 
   async forwardMessage(
-    senderId: number,
-    messageId: number,
+    senderId: string,
+    messageId: string,
     dto: ForwardMessageDto,
   ) {
     const isMember = await this.chatMemberService.isMember(
@@ -235,7 +235,7 @@ export class MessageService {
     return messageWithSender;
   }
 
-  async pinMessage(chatId: number, messageId: number) {
+  async pinMessage(chatId: string, messageId: string) {
     await this.messageRepository.update(
       { id: messageId, chatId },
       { isPinned: true },
@@ -251,7 +251,7 @@ export class MessageService {
     return message;
   }
 
-  async unpinMessage(chatId: number, messageId: number) {
+  async unpinMessage(chatId: string, messageId: string) {
     await this.messageRepository.update(
       { id: messageId, chatId },
       { isPinned: false },
@@ -265,7 +265,7 @@ export class MessageService {
     });
   }
 
-  async getPinnedMessages(chatId: number) {
+  async getPinnedMessages(chatId: string) {
     const messages = await this.messageRepository
       .createQueryBuilder('message')
       .where('message.chatId = :chatId', { chatId })
@@ -287,7 +287,7 @@ export class MessageService {
   }
 
 
-  private buildMessageQuery(chatId: number, userId: number) {
+  private buildMessageQuery(chatId: string, userId: string) {
     return this.messageRepository
       .createQueryBuilder('message')
       .leftJoin('message.replyToMessage', 'replyToMessage')
@@ -308,10 +308,10 @@ export class MessageService {
   }
 
   private async getMessagesAround(
-    chatId: number,
-    aroundId: number,
+    chatId: string,
+    aroundId: string,
     limit: number,
-    userId: number,
+    userId: string,
   ) {
     const half = Math.floor(limit / 2);
 
@@ -328,14 +328,16 @@ export class MessageService {
         .getMany(),
     ]);
 
-    return [...before, ...after].sort((a, b) => b.id - a.id);
+    return [...before, ...after].sort((a, b) =>
+      b.id > a.id ? 1 : b.id < a.id ? -1 : 0,
+    );
   }
 
   private async getMessagesAfter(
-    chatId: number,
-    afterId: number,
+    chatId: string,
+    afterId: string,
     limit: number,
-    userId: number,
+    userId: string,
   ) {
     const rows = await this.buildMessageQuery(chatId, userId)
       .andWhere('message.id > :afterId', { afterId })
@@ -347,10 +349,10 @@ export class MessageService {
   }
 
   private async getMessagesBefore(
-    chatId: number,
+    chatId: string,
     limit: number,
-    userId: number,
-    beforeId?: number,
+    userId: string,
+    beforeId?: string,
   ) {
     const qb = this.buildMessageQuery(chatId, userId)
       .orderBy('message.id', 'DESC')
@@ -364,12 +366,12 @@ export class MessageService {
   }
 
   async getMessages(
-    userId: number,
-    chatId: number,
-    beforeId?: number,
+    userId: string,
+    chatId: string,
+    beforeId?: string,
     limit = 20,
-    aroundId?: number,
-    afterId?: number,
+    aroundId?: string,
+    afterId?: string,
   ) {
     let messages: any[];
 
@@ -402,7 +404,7 @@ export class MessageService {
     return messages;
   }
 
-  private async attachSeenBy(messages: any[], chatId: number) {
+  private async attachSeenBy(messages: any[], chatId: string) {
     const lastThree = messages.slice(0, 3);
 
     const cursors = await this.chatMemberRepository
@@ -413,13 +415,15 @@ export class MessageService {
       .select(['member.userId', 'member.lastSeenMessageId'])
       .getMany();
 
-    const idsAsc = lastThree.map((m) => m.id).sort((a, b) => a - b);
-    const seenMap = new Map<number, number[]>();
+    const idsAsc = lastThree
+      .map((m) => m.id)
+      .sort((a: string, b: string) => (a > b ? 1 : a < b ? -1 : 0));
+    const seenMap = new Map<string, string[]>();
 
     for (const c of cursors) {
       const seenId = c.lastSeenMessageId;
       if (seenId === null) continue;
-      let target: number | null = null;
+      let target: string | null = null;
       for (const id of idsAsc) {
         if (id <= seenId) target = id;
         else break;
@@ -438,7 +442,7 @@ export class MessageService {
     }
   }
 
-  private async attachReactions(messages: any[], userId: number) {
+  private async attachReactions(messages: any[], userId: string) {
     const messageIds = messages.map((m) => m.id);
     // 1 query: vừa đếm count theo emoji, vừa biết user hiện tại đã react chưa
     // (BOOL_OR). Trước đây phải chạy 2 query (count + reaction của user).
@@ -454,11 +458,11 @@ export class MessageService {
       .getRawMany();
 
     const reactionMap = new Map<
-      number,
+      string,
       { emoji: string; count: number; reacted: boolean }[]
     >();
     for (const r of rows) {
-      const mid = Number(r.messageId);
+      const mid = r.messageId;
       if (!reactionMap.has(mid)) reactionMap.set(mid, []);
       reactionMap.get(mid)!.push({
         emoji: r.emoji,
@@ -471,7 +475,7 @@ export class MessageService {
     });
   }
 
-  private async attachPollVotes(messages: any[], userId: number) {
+  private async attachPollVotes(messages: any[], userId: string) {
     const pollMessages = messages.filter((m) => m.poll?.options?.length);
     if (!pollMessages.length) return;
 
@@ -512,21 +516,21 @@ export class MessageService {
     ]);
 
     const countMap = new Map(
-      voteCounts.map((r) => [Number(r.optionId), Number(r.count)]),
+      voteCounts.map((r) => [r.optionId, Number(r.count)]),
     );
 
     const votedSet = new Set(userVotes.map((v) => v.optionId));
 
-    const previewMap = new Map<number, number[]>();
+    const previewMap = new Map<string, string[]>();
 
     for (const p of previewVotes) {
-      const oid = Number(p.optionId);
+      const oid = p.optionId;
 
       if (!previewMap.has(oid)) {
         previewMap.set(oid, []);
       }
 
-      previewMap.get(oid)!.push(Number(p.userId));
+      previewMap.get(oid)!.push(p.userId);
     }
 
     pollMessages.forEach((m) => {
@@ -539,9 +543,9 @@ export class MessageService {
   }
 
   async getSharedContent(
-    chatId: number,
+    chatId: string,
     tab: 'media' | 'file' | 'link',
-    beforeId?: number,
+    beforeId?: string,
     limit = 20,
   ) {
     const qb = this.messageRepository
@@ -580,10 +584,10 @@ export class MessageService {
   }
 
   async searchMessages(
-    userId: number,
-    chatId: number,
+    userId: string,
+    chatId: string,
     q: string,
-    beforeId?: number,
+    beforeId?: string,
     limit = 20,
   ) {
     const keyword = q?.trim();
@@ -626,7 +630,7 @@ export class MessageService {
     return messages;
   }
 
-  async findMessageById(id: number) {
+  async findMessageById(id: string) {
     const message = await this.messageRepository.findOneBy({ id });
     if (!message) throw new NotFoundException('Message not found');
     return message;

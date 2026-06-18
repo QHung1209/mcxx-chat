@@ -6,8 +6,8 @@ export class MediaEntity extends DeletedAtEntity {
   static TABLE_NAME = 'medias';
 
   // Người upload (chủ sở hữu file). Nullable để hỗ trợ file hệ thống.
-  @Column('int', { nullable: true })
-  uploaderId: number | null;
+  @Column('uuid', { nullable: true })
+  uploaderId: string | null;
 
   @Column({ length: 255 })
   name: string;

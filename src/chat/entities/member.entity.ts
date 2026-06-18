@@ -9,14 +9,14 @@ import { User } from 'src/identity/entities/user.entity';
 export class ChatMember extends DeletedAtEntity {
   static TABLE_NAME = 'chat__members';
 
-  @Column()
-  chatId: number;
+  @Column('uuid')
+  chatId: string;
 
   @ManyToOne(() => Chat, (chat) => chat.members, { onDelete: 'CASCADE' })
   chat: Chat;
 
-  @Column()
-  userId: number;
+  @Column('uuid')
+  userId: string;
 
   @ManyToOne(() => User, (user) => user.chatMembers, { onDelete: 'CASCADE' })
   user: User;
@@ -24,9 +24,9 @@ export class ChatMember extends DeletedAtEntity {
   @Column({ type: 'enum', enum: ChatRole, default: ChatRole.MEMBER })
   role: ChatRole;
 
-  @Column({ nullable: true, type: 'int' })
-  lastSeenMessageId: number | null;
+  @Column({ nullable: true, type: 'uuid' })
+  lastSeenMessageId: string | null;
 
-  @Column({ nullable: true, type: 'int' })
-  hiddenAtMessageId: number | null;
+  @Column({ nullable: true, type: 'uuid' })
+  hiddenAtMessageId: string | null;
 }

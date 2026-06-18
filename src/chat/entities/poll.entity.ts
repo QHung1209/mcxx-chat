@@ -6,8 +6,8 @@ import { PollType } from '../enums/chat.enum';
 
 @Entity('chat__poll')
 export class Poll extends DefaultEntity {
-  @Column()
-  messageId: number;
+  @Column('uuid')
+  messageId: string;
 
   @ManyToOne(() => Message)
   @JoinColumn({ name: 'messageId' })

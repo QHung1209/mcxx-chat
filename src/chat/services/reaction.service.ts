@@ -13,11 +13,11 @@ export class ReactionService {
 
   private readonly REACTION_TTL = 3600; // 1 hour
 
-  private reactionKey(messageId: number) {
+  private reactionKey(messageId: string) {
     return `reaction:counts:${messageId}`;
   }
 
-  private async initReactionCache(messageId: number, key: string) {
+  private async initReactionCache(messageId: string, key: string) {
     const counts: { emoji: string; count: string }[] =
       await this.reactionRepository
         .createQueryBuilder('reaction')
@@ -38,7 +38,7 @@ export class ReactionService {
   }
 
   private async updateReactionCache(
-    messageId: number,
+    messageId: string,
     key: string,
     emoji: string,
     delta: number,
@@ -57,9 +57,9 @@ export class ReactionService {
   }
 
   async upsert(
-    userId: number,
-    chatId: number,
-    messageId: number,
+    userId: string,
+    chatId: string,
+    messageId: string,
     emoji: string,
   ) {
     const key = this.reactionKey(messageId);
@@ -92,7 +92,7 @@ export class ReactionService {
     });
   }
 
-  async countReaction(messageId: number) {
+  async countReaction(messageId: string) {
     const key = this.reactionKey(messageId);
     const exists = await this.redisService.exists(key);
 
@@ -107,7 +107,7 @@ export class ReactionService {
     }));
   }
 
-  async detailEmoji(messageId: number, emoji: string, createdAt?: Date) {
+  async detailEmoji(messageId: string, emoji: string, createdAt?: Date) {
     const qb = this.reactionRepository
       .createQueryBuilder('reaction')
       .where('reaction.messageId = :messageId', { messageId })

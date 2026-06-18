@@ -184,7 +184,7 @@ export class AuthService {
     );
   }
 
-  async changePassword(userId: number, dto: ChangePasswordDto) {
+  async changePassword(userId: string, dto: ChangePasswordDto) {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('Account not found');
@@ -220,7 +220,7 @@ export class AuthService {
     });
   }
 
-  private finalizeSession(user: any, payload: any, trackingId: number) {
+  private finalizeSession(user: any, payload: any, trackingId: string) {
     const tokens = this.baseAuthService._createToken({
       id: user.id,
       scope: payload.scope,

@@ -19,10 +19,10 @@ export class ChatEventListener {
   ) {}
 
   private emitToMembers(
-    memberIds: number[],
+    memberIds: string[],
     event: string,
     data: any,
-    excludeId?: number,
+    excludeId?: string,
   ) {
     memberIds
       .filter((id) => id !== excludeId)
@@ -32,10 +32,10 @@ export class ChatEventListener {
   }
 
   private async createSystemMessage(
-    chatId: number,
-    senderId: number,
+    chatId: string,
+    senderId: string,
     metadata: Record<string, any>,
-    memberIds: number[],
+    memberIds: string[],
   ) {
     const message = await this.messageRepository.save({
       chatId,
@@ -50,7 +50,7 @@ export class ChatEventListener {
   }
 
   @OnEvent('chat.group.created')
-  async onGroupCreated(payload: { chatId: number; actorId: number }) {
+  async onGroupCreated(payload: { chatId: string; actorId: string }) {
     const { chatId, actorId } = payload;
     const [actor, memberIds] = await Promise.all([
       this.userRepository.findOne({
@@ -73,7 +73,7 @@ export class ChatEventListener {
   }
 
   @OnEvent('chat.seen')
-  onSeen(payload: { userId: number; chatId: number; messageId: number }) {
+  onSeen(payload: { userId: string; chatId: string; messageId: string }) {
     const { userId, chatId, messageId } = payload;
     this.eventGateway.handleEmitToChat(chatId, 'SEEN', {
       userId,
@@ -84,9 +84,9 @@ export class ChatEventListener {
 
   @OnEvent('message.new')
   onNewMessage(payload: {
-    memberIds: number[];
+    memberIds: string[];
     message: any;
-    senderId: number;
+    senderId: string;
   }) {
     const { memberIds, message, senderId } = payload;
     this.emitToMembers(memberIds, 'NEW_MESSAGE', message, senderId);
@@ -94,9 +94,9 @@ export class ChatEventListener {
 
   @OnEvent('message.link.preview')
   onLinkPreview(payload: {
-    memberIds: number[];
-    messageId: number;
-    chatId: number;
+    memberIds: string[];
+    messageId: string;
+    chatId: string;
     previewData: any;
   }) {
     const { memberIds, messageId, chatId, previewData } = payload;
@@ -109,9 +109,9 @@ export class ChatEventListener {
 
   @OnEvent('message.deleted')
   onMessageDeleted(payload: {
-    memberIds: number[];
-    chatId: number;
-    messageId: number;
+    memberIds: string[];
+    chatId: string;
+    messageId: string;
   }) {
     const { memberIds, chatId, messageId } = payload;
     this.emitToMembers(memberIds, 'MESSAGE_DELETED', { chatId, messageId });
@@ -119,9 +119,9 @@ export class ChatEventListener {
 
   @OnEvent('message.pinned')
   onMessagePinned(payload: {
-    memberIds: number[];
-    chatId: number;
-    messageId: number;
+    memberIds: string[];
+    chatId: string;
+    messageId: string;
   }) {
     const { memberIds, chatId, messageId } = payload;
     this.emitToMembers(memberIds, 'MESSAGE_PINNED', { chatId, messageId });
@@ -129,9 +129,9 @@ export class ChatEventListener {
 
   @OnEvent('message.unpinned')
   onMessageUnpinned(payload: {
-    memberIds: number[];
-    chatId: number;
-    messageId: number;
+    memberIds: string[];
+    chatId: string;
+    messageId: string;
   }) {
     const { memberIds, chatId, messageId } = payload;
     this.emitToMembers(memberIds, 'MESSAGE_UNPINNED', { chatId, messageId });
@@ -139,9 +139,9 @@ export class ChatEventListener {
 
   @OnEvent('chat.member.added')
   async onMemberAdded(payload: {
-    chatId: number;
-    actorId: number;
-    targetIds: number[];
+    chatId: string;
+    actorId: string;
+    targetIds: string[];
   }) {
     const { chatId, actorId, targetIds } = payload;
     const [actor, targets, memberIds] = await Promise.all([
@@ -172,9 +172,9 @@ export class ChatEventListener {
 
   @OnEvent('chat.member.removed')
   async onMemberRemoved(payload: {
-    chatId: number;
-    actorId: number;
-    targetId: number;
+    chatId: string;
+    actorId: string;
+    targetId: string;
   }) {
     const { chatId, actorId, targetId } = payload;
     const [actor, target, memberIds] = await Promise.all([
@@ -204,7 +204,7 @@ export class ChatEventListener {
   }
 
   @OnEvent('chat.member.left')
-  async onMemberLeft(payload: { chatId: number; actorId: number }) {
+  async onMemberLeft(payload: { chatId: string; actorId: string }) {
     const { chatId, actorId } = payload;
     const [actor, memberIds] = await Promise.all([
       this.userRepository.findOne({
@@ -228,8 +228,8 @@ export class ChatEventListener {
 
   @OnEvent('message.reaction.updated')
   onReactionUpdated(payload: {
-    chatId: number;
-    messageId: number;
+    chatId: string;
+    messageId: string;
     reactions: any[];
   }) {
     const { chatId, messageId, reactions } = payload;
@@ -242,9 +242,9 @@ export class ChatEventListener {
 
   @OnEvent('chat.member.role.updated')
   async onMemberRoleUpdated(payload: {
-    chatId: number;
-    actorId: number;
-    targetId: number;
+    chatId: string;
+    actorId: string;
+    targetId: string;
     role: string;
   }) {
     const { chatId, actorId, targetId, role } = payload;
@@ -277,9 +277,9 @@ export class ChatEventListener {
 
   @OnEvent('chat.poll.voted')
   onPollVoted(payload: {
-    chatId: number;
-    messageId: number;
-    options: { id: number; count: number; previewUserIds: number[] }[];
+    chatId: string;
+    messageId: string;
+    options: { id: string; count: number; previewUserIds: string[] }[];
   }) {
     const { chatId, messageId, options } = payload;
     this.eventGateway.handleEmitToChat(chatId, 'POLL_UPDATED', {
@@ -291,9 +291,9 @@ export class ChatEventListener {
 
   @OnEvent('chat.poll.closed')
   onPollClosed(payload: {
-    chatId: number;
-    messageId: number;
-    userId: number;
+    chatId: string;
+    messageId: string;
+    userId: string;
   }) {
     const { chatId, messageId } = payload;
     this.eventGateway.handleEmitToChat(chatId, 'POLL_CLOSED', {

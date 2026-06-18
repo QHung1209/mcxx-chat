@@ -9,15 +9,15 @@ import { Message } from './message.entity';
 export class MessageMedia extends CreatedAtEntity {
   static TABLE_NAME = 'chat__message_media';
 
-  @Column()
-  messageId: number;
+  @Column('uuid')
+  messageId: string;
 
   @ManyToOne(() => Message, (message) => message.medias, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'messageId' })
   message: Message;
 
-  @Column()
-  mediaId: number;
+  @Column('uuid')
+  mediaId: string;
 
   @Column({ length: 255 })
   name: string;

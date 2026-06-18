@@ -1,7 +1,7 @@
 export interface JwtPayLoad {
-  id: number;
+  id: string;
   scope: string;
-  trackingId: number;
+  trackingId: string;
   iat: number;
   exp: number;
 }

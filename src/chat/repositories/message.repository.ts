@@ -11,7 +11,7 @@ export class MessageRepository extends Repository<Message> {
   }
 
   // Gắn danh sách media (theo id) vào một message → tạo các bản ghi chat__message_media.
-  async attachMedia(messageId: number, mediaIds?: number[]) {
+  async attachMedia(messageId: string, mediaIds?: string[]) {
     if (!mediaIds?.length) return;
     const medias = await this.manager.find(MediaEntity, {
       where: { id: In(mediaIds) },
@@ -53,7 +53,7 @@ export class MessageRepository extends Repository<Message> {
       where: { messageId: In(ids) },
       order: { order: 'ASC' },
     });
-    const map = new Map<number, MessageMedia[]>();
+    const map = new Map<string, MessageMedia[]>();
     for (const r of rows) {
       const list = map.get(r.messageId) ?? [];
       list.push(r);

@@ -22,7 +22,10 @@ export class RedisService {
   }
 
   async blockUser(trackingId, tokenExp: number, scope): Promise<void> {
-    const { shard, offset } = this.getShardAndOffset(Number(trackingId));
+    // trackingId là UUID → băm về index số 32-bit để định vị bit trong bitmap shard.
+    const { shard, offset } = this.getShardAndOffset(
+      this.getUserIndex(String(trackingId)),
+    );
     const key = `${this.redisKey}:${scope}:${shard}`;
 
     // 1) Set bit
@@ -50,8 +53,10 @@ export class RedisService {
     await this.redis.eval(luaScript, 1, key, expireAt, now);
   }
 
-  async isUserBlocked(trackingId: number, scope) {
-    const { shard, offset } = this.getShardAndOffset(Number(trackingId));
+  async isUserBlocked(trackingId: string, scope) {
+    const { shard, offset } = this.getShardAndOffset(
+      this.getUserIndex(String(trackingId)),
+    );
     const key = `${this.redisKey}:${scope}:${shard}`;
     return this.redis.getbit(key, offset);
   }

@@ -19,7 +19,7 @@ export class ChatMemberService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async markSeen(userId: number, chatId: number, messageId: number) {
+  async markSeen(userId: string, chatId: string, messageId: string) {
     const result = await this.chatMemberRepository
       .createQueryBuilder()
       .update()
@@ -36,9 +36,9 @@ export class ChatMemberService {
   }
 
   async addMembersToChat(
-    user: { id: number },
-    chatId: number,
-    userIds: number[],
+    user: { id: string },
+    chatId: string,
+    userIds: string[],
   ) {
     // Telegram-style: cho phép thêm bất kỳ user nào đang hoạt động.
     const users = await this.userRepository.find({
@@ -99,14 +99,14 @@ export class ChatMemberService {
     });
   }
 
-  async leaveChat(userId: number, chatId: number) {
+  async leaveChat(userId: string, chatId: string) {
     const chat = await this.chatRepository.findOne({ where: { id: chatId } });
     if (!chat) return;
 
     if (chat.type === ChatType.DIRECT) {
       await this.chatMemberRepository.update(
         { chatId, userId },
-        { hiddenAtMessageId: chat.lastMessageId ?? 0 },
+        { hiddenAtMessageId: chat.lastMessageId ?? null },
       );
       return;
     }
@@ -144,9 +144,9 @@ export class ChatMemberService {
   }
 
   async getHiddenAtMessageId(
-    chatId: number,
-    userId: number,
-  ): Promise<number | null> {
+    chatId: string,
+    userId: string,
+  ): Promise<string | null> {
     const member = await this.chatMemberRepository.findOne({
       where: { chatId, userId },
       select: ['hiddenAtMessageId'],
@@ -155,9 +155,9 @@ export class ChatMemberService {
   }
 
   async removeMemberFromChat(
-    chatId: number,
-    memberId: number,
-    actorId?: number,
+    chatId: string,
+    memberId: string,
+    actorId?: string,
   ) {
     const key = `chat:${chatId}:members`;
     await Promise.all([
@@ -174,10 +174,10 @@ export class ChatMemberService {
   }
 
   async updateMemberRoleInChat(
-    chatId: number,
-    memberId: number,
+    chatId: string,
+    memberId: string,
     role: ChatRole,
-    actorId?: number,
+    actorId?: string,
   ) {
     const key = `chat:${chatId}:members`;
     await Promise.all([
@@ -194,18 +194,18 @@ export class ChatMemberService {
     }
   }
 
-  async getSeenBy(chatId: number, messageId: number): Promise<number[]> {
+  async getSeenBy(chatId: string, messageId: string): Promise<string[]> {
     const rows = await this.chatMemberRepository
       .createQueryBuilder('member')
       .where('member.chatId = :chatId', { chatId })
       .andWhere('member.deletedAt IS NULL')
       .andWhere('member.lastSeenMessageId >= :messageId', { messageId })
       .select('member.userId', 'userId')
-      .getRawMany<{ userId: number }>();
-    return rows.map((r) => Number(r.userId));
+      .getRawMany<{ userId: string }>();
+    return rows.map((r) => r.userId);
   }
 
-  async getMembers(chatId: number) {
+  async getMembers(chatId: string) {
     const members = await this.chatMemberRepository
       .createQueryBuilder('chatMember')
       .leftJoinAndSelect('chatMember.user', 'user')
@@ -231,8 +231,8 @@ export class ChatMemberService {
   }
 
   async getMemberRole(
-    chatId: number,
-    userId: number,
+    chatId: string,
+    userId: string,
   ): Promise<ChatRole | null> {
     const key = `chat:${chatId}:members`;
     await this._loadMembersToCache(chatId, key);
@@ -240,18 +240,18 @@ export class ChatMemberService {
     return (role as ChatRole) ?? null;
   }
 
-  async isMember(chatId: number, userId: number): Promise<boolean> {
+  async isMember(chatId: string, userId: string): Promise<boolean> {
     return (await this.getMemberRole(chatId, userId)) !== null;
   }
 
-  async getMemberIds(chatId: number): Promise<number[]> {
+  async getMemberIds(chatId: string): Promise<string[]> {
     const key = `chat:${chatId}:members`;
     await this._loadMembersToCache(chatId, key);
     const ids = await this.redisService.hkeys(key);
-    return ids.map(Number);
+    return ids;
   }
 
-  private async _loadMembersToCache(chatId: number, key: string) {
+  private async _loadMembersToCache(chatId: string, key: string) {
     const exists = await this.redisService.exists(key);
     if (exists) return;
 

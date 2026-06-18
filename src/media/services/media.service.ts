@@ -43,7 +43,7 @@ export class MediaService {
     });
   }
 
-  async get(dto: MediaDto, uploaderId?: number) {
+  async get(dto: MediaDto, uploaderId?: string) {
     const qb = this.mediaRepository.createQueryBuilder();
     if (uploaderId) {
       qb.andWhere('uploaderId = :uploaderId', { uploaderId });
@@ -80,7 +80,7 @@ export class MediaService {
     };
   }
 
-  async detail(id: number, uploaderId?: number) {
+  async detail(id: string, uploaderId?: string) {
     const media = await this.mediaRepository.findOneBy(
       uploaderId ? { id, uploaderId } : { id },
     );
@@ -99,7 +99,7 @@ export class MediaService {
     return media;
   }
 
-  async upload(file, { uploaderId, acl }: { uploaderId: number; acl: boolean }) {
+  async upload(file, { uploaderId, acl }: { uploaderId: string; acl: boolean }) {
     const timestamp = Math.floor(
       DateTime.local().setZone('Asia/Ho_Chi_Minh').toSeconds(),
     );
@@ -144,7 +144,7 @@ export class MediaService {
     return media;
   }
 
-  async uploadStream(req: Request, { uploaderId }: { uploaderId: number }) {
+  async uploadStream(req: Request, { uploaderId }: { uploaderId: string }) {
     return new Promise<MediaEntity>((resolve, reject) => {
       const busboy = new Busboy({ headers: req.headers } as any);
       let mediaPromise: Promise<MediaEntity> | null = null;
@@ -256,7 +256,7 @@ export class MediaService {
     });
   }
 
-  async updateAcl(id: number, acl: boolean, uploaderId?: number) {
+  async updateAcl(id: string, acl: boolean, uploaderId?: string) {
     const media = await this.mediaRepository.findOneBy(
       uploaderId ? { id, uploaderId } : { id },
     );
@@ -265,7 +265,7 @@ export class MediaService {
     }
   }
 
-  async updateActive(id: number, isActive: boolean, uploaderId?: number) {
+  async updateActive(id: string, isActive: boolean, uploaderId?: string) {
     const media = await this.mediaRepository.findOneBy(
       uploaderId ? { id, uploaderId } : { id },
     );
@@ -274,7 +274,7 @@ export class MediaService {
     }
   }
 
-  async delete(id: number, uploaderId?: number) {
+  async delete(id: string, uploaderId?: string) {
     const media = await this.mediaRepository.findOneBy(
       uploaderId ? { id, uploaderId } : { id },
     );
@@ -283,7 +283,7 @@ export class MediaService {
     }
   }
 
-  async putBack(id: number, uploaderId?: number) {
+  async putBack(id: string, uploaderId?: string) {
     const media = await this.mediaRepository.findOne({
       where: uploaderId ? { id, uploaderId } : { id },
       withDeleted: true,
@@ -293,7 +293,7 @@ export class MediaService {
     }
   }
 
-  async deleteForever(id: number, uploaderId?: number) {
+  async deleteForever(id: string, uploaderId?: string) {
     const media = await this.mediaRepository.findOne({
       where: uploaderId ? { id, uploaderId } : { id },
       withDeleted: true,
@@ -345,7 +345,7 @@ export class MediaService {
   }
 
   // Lấy danh sách media theo id, giới hạn trong các file của chính user.
-  async getByIdsUser(ids: number[], userId: number) {
+  async getByIdsUser(ids: string[], userId: string) {
     if (!ids?.length) return [];
     return this.mediaRepository.find({
       where: {
@@ -355,7 +355,7 @@ export class MediaService {
     });
   }
 
-  async getByIds(ids: number[]) {
+  async getByIds(ids: string[]) {
     if (!ids?.length) return [];
     return this.mediaRepository.findBy({ id: In(ids) });
   }
@@ -370,7 +370,7 @@ export class MediaService {
     if (!records?.length) return records;
     const ids = [
       ...new Set(records.map((r) => r?.[idField]).filter(Boolean)),
-    ] as number[];
+    ] as string[];
     if (!ids.length) {
       records.forEach((r) => {
         if (r) r[as] = null;

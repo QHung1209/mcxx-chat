@@ -7,14 +7,14 @@ export class InitChat1778000000003 implements MigrationInterface {
     // chats
     await queryRunner.query(
       `CREATE TABLE "chat__chats" (
-        "id" SERIAL NOT NULL,
+        "id" uuid NOT NULL DEFAULT uuid_generate_v7(),
         "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "deletedAt" TIMESTAMP WITH TIME ZONE,
         "type" character varying(20) NOT NULL,
         "name" character varying(255),
-        "avatarMediaId" integer,
-        "lastMessageId" integer,
+        "avatarMediaId" uuid,
+        "lastMessageId" uuid,
         CONSTRAINT "PK_chat_chats" PRIMARY KEY ("id")
       )`,
     );
@@ -25,15 +25,15 @@ export class InitChat1778000000003 implements MigrationInterface {
     // members
     await queryRunner.query(
       `CREATE TABLE "chat__members" (
-        "id" SERIAL NOT NULL,
+        "id" uuid NOT NULL DEFAULT uuid_generate_v7(),
         "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "deletedAt" TIMESTAMP WITH TIME ZONE,
-        "chatId" integer NOT NULL,
-        "userId" integer NOT NULL,
+        "chatId" uuid NOT NULL,
+        "userId" uuid NOT NULL,
         "role" character varying(20) NOT NULL DEFAULT 'MEMBER',
-        "lastSeenMessageId" integer,
-        "hiddenAtMessageId" integer,
+        "lastSeenMessageId" uuid,
+        "hiddenAtMessageId" uuid,
         CONSTRAINT "PK_chat_members" PRIMARY KEY ("id")
       )`,
     );
@@ -48,21 +48,21 @@ export class InitChat1778000000003 implements MigrationInterface {
     // messages
     await queryRunner.query(
       `CREATE TABLE "chat__messages" (
-        "id" SERIAL NOT NULL,
+        "id" uuid NOT NULL DEFAULT uuid_generate_v7(),
         "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "deletedAt" TIMESTAMP WITH TIME ZONE,
-        "chatId" integer NOT NULL,
-        "senderId" integer NOT NULL,
+        "chatId" uuid NOT NULL,
+        "senderId" uuid NOT NULL,
         "content" text,
         "type" character varying(20) NOT NULL DEFAULT 'TEXT',
-        "replyToMessageId" integer,
-        "forwardFromMessageId" integer,
+        "replyToMessageId" uuid,
+        "forwardFromMessageId" uuid,
         "isPinned" boolean NOT NULL DEFAULT false,
         "hasLink" boolean NOT NULL DEFAULT false,
         "previewData" jsonb,
         "metadata" jsonb,
-        "mentionIds" integer array,
+        "mentionIds" uuid array,
         "mentionAll" boolean NOT NULL DEFAULT false,
         CONSTRAINT "PK_chat_messages" PRIMARY KEY ("id")
       )`,
@@ -81,10 +81,10 @@ export class InitChat1778000000003 implements MigrationInterface {
     // message media (attachments)
     await queryRunner.query(
       `CREATE TABLE "chat__message_media" (
-        "id" SERIAL NOT NULL,
+        "id" uuid NOT NULL DEFAULT uuid_generate_v7(),
         "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-        "messageId" integer NOT NULL,
-        "mediaId" integer NOT NULL,
+        "messageId" uuid NOT NULL,
+        "mediaId" uuid NOT NULL,
         "name" character varying(255) NOT NULL,
         "fileName" character varying(255) NOT NULL,
         "mimeType" character varying(255) NOT NULL,
@@ -106,11 +106,11 @@ export class InitChat1778000000003 implements MigrationInterface {
     // reactions
     await queryRunner.query(
       `CREATE TABLE "chat__reactions" (
-        "id" SERIAL NOT NULL,
+        "id" uuid NOT NULL DEFAULT uuid_generate_v7(),
         "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-        "messageId" integer NOT NULL,
-        "userId" integer NOT NULL,
+        "messageId" uuid NOT NULL,
+        "userId" uuid NOT NULL,
         "emoji" character varying(20) NOT NULL,
         CONSTRAINT "PK_chat_reactions" PRIMARY KEY ("id"),
         CONSTRAINT "uq_reaction_messageId_userId" UNIQUE ("messageId", "userId")
@@ -123,10 +123,10 @@ export class InitChat1778000000003 implements MigrationInterface {
     // poll
     await queryRunner.query(
       `CREATE TABLE "chat__poll" (
-        "id" SERIAL NOT NULL,
+        "id" uuid NOT NULL DEFAULT uuid_generate_v7(),
         "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-        "messageId" integer NOT NULL,
+        "messageId" uuid NOT NULL,
         "name" text NOT NULL,
         "type" character varying(20) NOT NULL,
         "closedAt" TIMESTAMP WITH TIME ZONE,
@@ -137,10 +137,10 @@ export class InitChat1778000000003 implements MigrationInterface {
     // poll option
     await queryRunner.query(
       `CREATE TABLE "chat__poll_option" (
-        "id" SERIAL NOT NULL,
+        "id" uuid NOT NULL DEFAULT uuid_generate_v7(),
         "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-        "pollId" integer NOT NULL,
+        "pollId" uuid NOT NULL,
         "content" character varying NOT NULL,
         "order" integer NOT NULL,
         CONSTRAINT "PK_chat_poll_option" PRIMARY KEY ("id")
@@ -153,12 +153,12 @@ export class InitChat1778000000003 implements MigrationInterface {
     // poll vote
     await queryRunner.query(
       `CREATE TABLE "chat__poll_vote" (
-        "id" SERIAL NOT NULL,
+        "id" uuid NOT NULL DEFAULT uuid_generate_v7(),
         "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-        "optionId" integer NOT NULL,
-        "pollId" integer NOT NULL,
-        "userId" integer NOT NULL,
+        "optionId" uuid NOT NULL,
+        "pollId" uuid NOT NULL,
+        "userId" uuid NOT NULL,
         CONSTRAINT "PK_chat_poll_vote" PRIMARY KEY ("id")
       )`,
     );

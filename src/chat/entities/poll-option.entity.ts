@@ -6,8 +6,8 @@ import { Poll } from './poll.entity';
 @Entity('chat__poll_option')
 @Index('idx_polloption_pollId', ['pollId'])
 export class PollOption extends DefaultEntity {
-  @Column()
-  pollId: number;
+  @Column('uuid')
+  pollId: string;
 
   @ManyToOne(() => Poll)
   @JoinColumn({ name: 'pollId' })

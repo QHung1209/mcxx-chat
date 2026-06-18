@@ -1,9 +1,9 @@
 import {
   IsEmail,
-  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUUID,
   MinLength,
 } from 'class-validator';
 
@@ -67,8 +67,8 @@ export class UpdateProfileDto {
   name?: string;
 
   @IsOptional()
-  @IsInt()
-  mediaId?: number;
+  @IsUUID()
+  mediaId?: string;
 }
 
 export class ResetPasswordDto {

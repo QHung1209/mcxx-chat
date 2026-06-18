@@ -22,14 +22,14 @@ import { MessageMedia } from './message-media.entity';
 export class Message extends DeletedAtEntity {
   static TABLE_NAME = 'chat__messages';
 
-  @Column()
-  chatId: number;
+  @Column('uuid')
+  chatId: string;
 
   @ManyToOne(() => Chat, (chat) => chat.messages, { onDelete: 'CASCADE' })
   chat: Chat;
 
-  @Column()
-  senderId: number;
+  @Column('uuid')
+  senderId: string;
 
   @ManyToOne(() => User, (user) => user.messages)
   sender: User;
@@ -40,16 +40,16 @@ export class Message extends DeletedAtEntity {
   @Column({ type: 'enum', enum: MessageType, default: MessageType.TEXT })
   type: MessageType;
 
-  @Column({ nullable: true })
-  replyToMessageId: number;
+  @Column({ type: 'uuid', nullable: true })
+  replyToMessageId: string;
 
   @ManyToOne(() => Message, (message) => message.replyToMessage, {
     onDelete: 'SET NULL',
   })
   replyToMessage: Message;
 
-  @Column({ nullable: true })
-  forwardFromMessageId: number;
+  @Column({ type: 'uuid', nullable: true })
+  forwardFromMessageId: string;
 
   @ManyToOne(() => Message, { nullable: true, onDelete: 'SET NULL' })
   forwardFromMessage: Message;
@@ -74,17 +74,17 @@ export class Message extends DeletedAtEntity {
   @Column({ nullable: true, type: 'jsonb' })
   metadata: {
     event: string;
-    actorId: number;
+    actorId: string;
     actorName: string;
-    targetId?: number;
+    targetId?: string;
     targetName?: string;
-    targetIds?: number[];
+    targetIds?: string[];
     targetNames?: string[];
     role?: string;
   };
 
-  @Column('int', { array: true, nullable: true })
-  mentionIds: number[] | null;
+  @Column('uuid', { array: true, nullable: true })
+  mentionIds: string[] | null;
 
   @Column({ default: false, type: 'boolean' })
   mentionAll: boolean;

@@ -24,8 +24,8 @@ export class Chat extends DeletedAtEntity {
   @Column({ nullable: true, type: 'varchar', length: 255 })
   name: string | null;
 
-  @Column({ type: 'int', nullable: true })
-  avatarMediaId: number | null;
+  @Column({ type: 'uuid', nullable: true })
+  avatarMediaId: string | null;
 
   @ManyToOne(() => MediaEntity, { nullable: true })
   @JoinColumn({ name: 'avatarMediaId' })
@@ -37,8 +37,8 @@ export class Chat extends DeletedAtEntity {
   @OneToMany(() => Message, (message) => message.chat)
   messages: Message[];
 
-  @Column({ nullable: true, type: 'int' })
-  lastMessageId: number | null;
+  @Column({ nullable: true, type: 'uuid' })
+  lastMessageId: string | null;
 
   @OneToOne(() => Message, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'lastMessageId' })

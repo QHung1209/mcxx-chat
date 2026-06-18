@@ -22,7 +22,7 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(String(to)).emit(event, data);
   }
 
-  handleEmitToChat(chatId: number, event: string, data: any): void {
+  handleEmitToChat(chatId: string, event: string, data: any): void {
     this.server.to(`chat:${chatId}`).emit(event, data);
   }
 
