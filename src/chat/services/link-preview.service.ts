@@ -22,7 +22,7 @@ export class LinkPreviewService {
     try {
       const data = await getLinkPreview(url, {
         timeout: 5000,
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; PolarisBot/1.0)' },
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; mcxxBot/1.0)' },
         resolveDNSHost: async (target) => {
           const { hostname } = new URL(target);
           const { address } = await lookup(hostname);

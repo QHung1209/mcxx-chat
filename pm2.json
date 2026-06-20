@@ -4,7 +4,7 @@
       "name": "mcxx_chat",
       "script": "main_dist/main.js",
       "exec_mode": "cluster",
-      "instances": -1
+      "instances": 2
     }
   ]
 }

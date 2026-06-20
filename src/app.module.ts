@@ -46,7 +46,7 @@ import appConfig from './support/config/app.config';
         const configMail = {
           transport: {},
           defaults: {
-            from: `"POLARIS CHAT" <${config.getOrThrow<string>('MAIL_FROM')}>`,
+            from: `"mcxx CHAT" <${config.getOrThrow<string>('MAIL_FROM')}>`,
           },
           template: {
             dir: join(__dirname, '../views/email'),
