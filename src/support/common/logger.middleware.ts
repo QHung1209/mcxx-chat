@@ -24,7 +24,7 @@ export class LoggerMiddleware implements NestMiddleware {
     res.send = (body: any) => {
       const duration = Date.now() - startTime;
       Logger.log(
-        `HTTP >> End process '${processId}' >> path: '${originalUrl}' >> method: '${method}' at '${now}' >> duration: ${duration} ms`,
+        `HTTP >> End process '${processId}' >> path: '${originalUrl}' >> method: '${method}' at '${now}' >> duration: ${duration} ms >> status: ${res.statusCode}`,
       );
       return originalSend(body);
     };

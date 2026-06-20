@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { EntityManager, In, Repository } from 'typeorm';
+import { EntityManager, In } from 'typeorm';
 import { Message } from '../entities/message.entity';
 import { MessageMedia } from '../entities/message-media.entity';
 import { MediaEntity } from 'src/media/entities/media.entity';
+import { BaseRepository } from 'src/support/repositories/base.repository';
 
 @Injectable()
-export class MessageRepository extends Repository<Message> {
+export class MessageRepository extends BaseRepository<Message> {
   constructor(entityManager: EntityManager) {
     super(Message, entityManager);
   }
